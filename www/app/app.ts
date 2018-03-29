@@ -255,12 +255,14 @@ export class App {
       console.error(`No server with id ${serverId}`);
       return this.showLocalizedError();
     }
-    const onceNotRunning = server.checkRunning().then((isRunning) => {
-      return isRunning ? this.disconnectServer(event) : Promise.resolve();
-    });
-    onceNotRunning.then(() => {
-      this.serverRepo.forget(serverId);
-    });
+    server.disconnect().then(
+        () => {
+          this.serverRepo.forget(serverId);
+        },
+        (e) => {
+          console.error(`could not disconnect from server before forgetting it`);
+          this.showLocalizedError();
+        });
   }
 
   private renameServer(event: CustomEvent) {
